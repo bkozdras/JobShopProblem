@@ -1,17 +1,94 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="SystemUnderTest">
+      <UniqueIdentifier>{870bc733-ec9a-4c87-a05e-7ff21e066e11}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UT">
+      <UniqueIdentifier>{211585d5-9a4f-4599-a5c3-a69106ab11fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UT\TestCases">
+      <UniqueIdentifier>{f166886d-e288-48f3-a2c7-51409c438ab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UT\Mocks">
+      <UniqueIdentifier>{7723f8de-1885-406b-9470-20082b83e39a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UT\Helpers">
+      <UniqueIdentifier>{32c5f6be-e61f-4c75-ba8c-1affec672db7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SystemUnderTest\Details">
+      <UniqueIdentifier>{bac139fc-0e02-4470-9f27-ee574d2368e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SystemUnderTest\Utilities">
+      <UniqueIdentifier>{e13d6dc9-8262-463f-9085-fef49a6eb8b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SystemUnderTest\Program">
+      <UniqueIdentifier>{2916270e-f07a-46dd-b89a-cb32a0749f3b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SystemUnderTest\Controller">
+      <UniqueIdentifier>{f70f917e-9628-42dd-92e2-b5fc52896acf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="UTMain.cpp">
+      <Filter>UT\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="UTFileReader.cpp">
+      <Filter>UT\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="UTJobShopData.cpp">
+      <Filter>UT\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="UTProgram.cpp">
+      <Filter>UT\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="UTUtilities.cpp">
+      <Filter>UT\TestCases</Filter>
+    </ClCompile>
+    <ClCompile Include="Details.cpp">
+      <Filter>SystemUnderTest\Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.cpp">
+      <Filter>SystemUnderTest\Details</Filter>
+    </ClCompile>
+    <ClCompile Include="Utilities.cpp">
+      <Filter>SystemUnderTest\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="FileReader.cpp">
+      <Filter>SystemUnderTest\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="ProgramController.cpp">
+      <Filter>SystemUnderTest\Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="JobShopData.cpp">
+      <Filter>SystemUnderTest\Program</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Details.hpp">
+      <Filter>SystemUnderTest\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.hpp">
+      <Filter>SystemUnderTest\Details</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.hpp">
+      <Filter>SystemUnderTest\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="FileReader.hpp">
+      <Filter>SystemUnderTest\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ProgramController.hpp">
+      <Filter>SystemUnderTest\Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="JobShopData.hpp">
+      <Filter>SystemUnderTest\Program</Filter>
+    </ClInclude>
+    <ClInclude Include="UTSettings.hpp">
+      <Filter>UT\Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

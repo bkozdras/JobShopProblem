@@ -51,6 +51,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>E:\Work\LibrariesCPlusPlus\boost_1_55_0\stage\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -68,6 +69,26 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Data.cpp" />
+    <ClCompile Include="Details.cpp" />
+    <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="JobShopData.cpp" />
+    <ClCompile Include="ProgramController.cpp" />
+    <ClCompile Include="UTFileReader.cpp" />
+    <ClCompile Include="Utilities.cpp" />
+    <ClCompile Include="UTJobShopData.cpp" />
+    <ClCompile Include="UTMain.cpp" />
+    <ClCompile Include="UTProgram.cpp" />
+    <ClCompile Include="UTUtilities.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Data.hpp" />
+    <ClInclude Include="Details.hpp" />
+    <ClInclude Include="FileReader.hpp" />
+    <ClInclude Include="JobShopData.hpp" />
+    <ClInclude Include="ProgramController.hpp" />
+    <ClInclude Include="Utilities.hpp" />
+    <ClInclude Include="UTSettings.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
