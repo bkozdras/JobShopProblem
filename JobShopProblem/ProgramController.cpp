@@ -15,39 +15,44 @@ void ProgramController::initialize(std::initializer_list< ProgramController::Tas
     mTaskList.insert(mTaskList.end(), taskList.begin(), taskList.end());
 }
 
-bool ProgramController::run()
+ProgramController::ExecuteResult ProgramController::run()
 {
+    ExecuteResult executeResult = ExecuteResult::Success;
+
     for (const auto & taskName : mTaskList)
     {
         auto & task = mTaskMap[taskName];
-        bool result = task();
-        if (false == result)
+        ExecuteResult executeResult = task();
+        if (ExecuteResult::Failure == executeResult)
         {
             handleTaskError(taskName);
-            return false;
+            return executeResult;
         }
     }
 
-    return true;
+    return executeResult;
 }
 
 void ProgramController::initializeTaskMap()
 {
     if (mTaskMap.empty())
     {
-        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::ReadData, std::bind((bool(*)())&ProgramController::readDataInputFile)));
-        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::ParseData, std::bind((bool(*)())&ProgramController::parseReadData)));
-        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::InitializeJobShopData, std::bind((bool(*)())&ProgramController::initializeJobShopData)));
+        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::ReadData, std::bind((ExecuteResult(*)())&ProgramController::readDataInputFile)));
+        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::ParseData, std::bind((ExecuteResult(*)())&ProgramController::parseReadData)));
+        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::InitializeJobShopData, std::bind((ExecuteResult(*)())&ProgramController::initializeJobShopData)));
     }
 }
 
-bool ProgramController::readDataInputFile()
+ProgramController::ExecuteResult ProgramController::readDataInputFile()
 {
     const std::string fileName = Program::Details::DataFileName();
-    return Utilities::FileReader::Instance()->readData(fileName);
+
+    bool readResult = Utilities::FileReader::Instance()->readData(fileName);
+
+    return returnExecuteResult(readResult);
 }
 
-bool ProgramController::parseReadData()
+ProgramController::ExecuteResult ProgramController::parseReadData()
 {
     std::vector< std::vector< int > > readIntLines;
     const std::vector< std::string > & readData = Utilities::FileReader::Instance()->getReadData();
@@ -61,43 +66,83 @@ bool ProgramController::parseReadData()
 
     Program::Details::ReadDataFromFile(std::move(readIntLines));
 
-    return result;
+    return returnExecuteResult(result);
 }
 
-bool ProgramController::initializeJobShopData()
+ProgramController::ExecuteResult ProgramController::initializeJobShopData()
 {
     Program::Details::JobShopData().initializeT();
 
-    return true;
+    return returnExecuteResult(true);
 }
 
 void ProgramController::handleTaskError(const ProgramController::TaskName & taskName)
 {
     switch (taskName)
     {
-    case TaskName::ReadData:
+        case TaskName::ReadData:
+        {
+            std::cout << "Handle task error: Fail during reading data from provided file!" << std::endl;
+            break;
+        }
+
+        case TaskName::ParseData:
+        {
+            std::cout << "Handle task error: Fail during parsing read data!" << std::endl;
+            break;
+        }
+
+        case TaskName::InitializeJobShopData:
+        {
+            std::cout << "Handle task error: Fail during initializing job shop data!" << std::endl;
+            break;
+        }
+
+        default:
+        {
+            assert(0 && "ProgramController::handleTaskError: Add missed value to switch statement");
+        }
+    }
+}
+
+ProgramController::ExecuteResult ProgramController::returnExecuteResult(bool result)
+{
+    if (result)
     {
-        std::cout << "Handle task error: Fail during reading data from provided file!" << std::endl;
-        break;
+        return ExecuteResult::Success;
+    }
+    else
+    {
+        return ExecuteResult::Failure;
+    }
+}
+
+std::string ProgramController::getEnumString(const ProgramController::ExecuteResult & executeResult)
+{
+    switch (executeResult)
+    {
+        case ExecuteResult::Failure :
+        {
+            return "ExecuteResult_Failure";
+        }
+
+        case ExecuteResult::Success :
+        {
+            return "ExecuteResult_Success";
+        }
+
+        default:
+        {
+            assert(0 && "ProgramController::getEnumString: Add missed value to switch statement");
+        }
     }
 
-    case TaskName::ParseData:
-    {
-        std::cout << "Handle task error: Fail during parsing read data!" << std::endl;
-        break;
-    }
+    return "";
+}
 
-    case TaskName::InitializeJobShopData:
-    {
-        std::cout << "Handle task error: Fail during initializing job shop data!" << std::endl;
-        break;
-    }
-
-    default:
-    {
-        assert(0 && "ProgramController::handleTaskError: Add missed value to switch statement");
-    }
-    }
+std::ostream & operator<< (std::ostream & stream, const ProgramController::ExecuteResult & executeResult)
+{
+    return ( stream << ProgramController::getEnumString(executeResult) );
 }
 
 std::map<ProgramController::TaskName, ProgramController::Task> ProgramController::mTaskMap;

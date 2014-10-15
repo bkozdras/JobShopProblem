@@ -17,15 +17,15 @@ BOOST_AUTO_TEST_SUITE(UT)
             Program::Details::DataFileName(testedFileName);
 
             ProgramController::initialize
-                (
-            {
-                ProgramController::TaskName::ReadData,
-                ProgramController::TaskName::ParseData,
-                ProgramController::TaskName::InitializeJobShopData
-            }
+            (
+                {
+                    ProgramController::TaskName::ReadData,
+                    ProgramController::TaskName::ParseData,
+                    ProgramController::TaskName::InitializeJobShopData
+                }
             );
 
-            BOOST_REQUIRE(ProgramController::run());
+            BOOST_REQUIRE_EQUAL(ProgramController::ExecuteResult::Success, ProgramController::run());
         }
 
     BOOST_AUTO_TEST_SUITE_END()
