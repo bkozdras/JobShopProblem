@@ -15,9 +15,9 @@ BOOST_AUTO_TEST_SUITE(UT)
             const unsigned int exampleFileLineNumbers = 4;
 
             BOOST_REQUIRE(Utilities::FileReader::Instance()->readData(exampleFilePath));
-
+            
             unsigned int readLines = Utilities::FileReader::Instance()->getReadData().size();
-
+            
             BOOST_REQUIRE(exampleFileLineNumbers == readLines);
         }
 
