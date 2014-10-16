@@ -1,4 +1,5 @@
 #include "ProgramController.hpp"
+#include "JobShopData.hpp"
 #include "FileReader.hpp"
 #include "Data.hpp"
 #include "Utilities.hpp"
@@ -73,8 +74,8 @@ ProgramController::ExecuteResult ProgramController::parseReadData()
 ProgramController::ExecuteResult ProgramController::initializeJobShopData()
 {
     Program::Details::JobShopData().initializeT();
-    Program::Details::JobShopData().initializeA(Program::Details::DataFromFile());
-    Program::Details::JobShopData().initializeP(Program::Details::DataFromFile());
+    Program::Details::JobShopData().initializeA();
+    Program::Details::JobShopData().initializeP();
 
     return returnExecuteResult(true);
 }

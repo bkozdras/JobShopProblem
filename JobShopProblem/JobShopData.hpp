@@ -34,8 +34,8 @@ namespace Types
             std::vector< TaskPositionInPermutation > & PS();
 
             void initializeT();
-            void initializeA(std::vector< std::vector<int> > fileContent);
-            void initializeP(std::vector< std::vector<int> > fileContent);
+            void initializeA();
+            void initializeP();
             
             void fillLO();
             void fillOFs();

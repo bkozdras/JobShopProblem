@@ -1,4 +1,5 @@
 #include "Data.hpp"
+#include "JobShopData.hpp"
 
 namespace Program
 {
@@ -27,13 +28,12 @@ namespace Program
         return mJobShopData;
     }
 
-    std::string Details::mDataFileName;
-    Types::JobShopData Details::mJobShopData;
-    std::vector< std::vector< int > > Details::mReadDataFromFile;
-
-
-    std::vector< std::vector< int > > Details::DataFromFile()
+    const std::vector< std::vector< int > > & Details::ReadDataFromFile()
     {
         return Details::mReadDataFromFile;
     }
+
+    std::string Details::mDataFileName;
+    Types::JobShopData Details::mJobShopData;
+    std::vector< std::vector< int > > Details::mReadDataFromFile;
 }

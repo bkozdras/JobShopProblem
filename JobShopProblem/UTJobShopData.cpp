@@ -4,6 +4,7 @@
 #include "UTSettings.hpp"
 
 #include "JobShopData.hpp"
+#include "Data.hpp"
 
 
 BOOST_AUTO_TEST_SUITE(UT)
@@ -38,16 +39,15 @@ BOOST_AUTO_TEST_SUITE(UT)
                 std::vector<int>{2, 9, 1, 4, 3, 5}
             };
 
-            Types::JobShopData jobShopData;
+            Program::Details::ReadDataFromFile(std::move(parsedFile));
+            Program::Details::JobShopData().initializeA();
 
-            jobShopData.initializeA(parsedFile);
 
+            BOOST_REQUIRE(Program::Details::JobShopData().A().size() == expectedA.size());
 
-            BOOST_REQUIRE(jobShopData.A().size() == expectedA.size());
-
-            for (decltype(jobShopData.A().size()) i = 0; i < jobShopData.A().size(); i++)
+            for (decltype(Program::Details::JobShopData().A().size()) i = 0; i < Program::Details::JobShopData().A().size(); i++)
             {
-                BOOST_REQUIRE(jobShopData.A().at(i) == expectedA[i]);;
+                BOOST_REQUIRE(Program::Details::JobShopData().A().at(i) == expectedA[i]);;
             }
         }
 
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_SUITE(UT)
 
             Types::JobShopData jobShopData;
 
-            jobShopData.initializeP(parsedFile);
+            jobShopData.initializeP();
 
 
             BOOST_REQUIRE(jobShopData.P().size() == expectedP.size());

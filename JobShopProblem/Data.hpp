@@ -3,7 +3,11 @@
 #include <string>
 #include <functional>
 #include <vector>
-#include "JobShopData.hpp"
+
+namespace Types
+{
+    class JobShopData;
+}
 
 namespace Program
 {
@@ -15,9 +19,9 @@ namespace Program
             static void DataFileName(std::string && dataFileName);
             static std::string & DataFileName();
             static void ReadDataFromFile(std::vector< std::vector< int > > && readDataFromFile);
+            static const std::vector< std::vector< int > > & ReadDataFromFile();
 
             static Types::JobShopData & JobShopData();
-            static std::vector< std::vector< int > > DataFromFile();
 
         private:
 
