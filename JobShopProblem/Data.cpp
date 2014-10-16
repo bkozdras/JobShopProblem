@@ -30,4 +30,10 @@ namespace Program
     std::string Details::mDataFileName;
     Types::JobShopData Details::mJobShopData;
     std::vector< std::vector< int > > Details::mReadDataFromFile;
+
+
+    std::vector< std::vector< int > > Details::DataFromFile()
+    {
+        return Details::mReadDataFromFile;
+    }
 }

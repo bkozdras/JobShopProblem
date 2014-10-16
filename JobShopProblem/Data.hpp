@@ -17,6 +17,7 @@ namespace Program
             static void ReadDataFromFile(std::vector< std::vector< int > > && readDataFromFile);
 
             static Types::JobShopData & JobShopData();
+            static std::vector< std::vector< int > > DataFromFile();
 
         private:
 

@@ -40,6 +40,7 @@ void ProgramController::initializeTaskMap()
         mTaskMap.insert(std::pair<TaskName, Task>(TaskName::ReadData, std::bind((ExecuteResult(*)())&ProgramController::readDataInputFile)));
         mTaskMap.insert(std::pair<TaskName, Task>(TaskName::ParseData, std::bind((ExecuteResult(*)())&ProgramController::parseReadData)));
         mTaskMap.insert(std::pair<TaskName, Task>(TaskName::InitializeJobShopData, std::bind((ExecuteResult(*)())&ProgramController::initializeJobShopData)));
+        mTaskMap.insert(std::pair<TaskName, Task>(TaskName::CalculateJobShopTables, std::bind((ExecuteResult(*)())&ProgramController::calculateJobShopTables)));
     }
 }
 
@@ -54,7 +55,7 @@ ProgramController::ExecuteResult ProgramController::readDataInputFile()
 
 ProgramController::ExecuteResult ProgramController::parseReadData()
 {
-    std::vector< std::vector< int > > readIntLines;
+    std::vector< std::vector<int> > readIntLines;
     const std::vector< std::string > & readData = Utilities::FileReader::Instance()->getReadData();
     bool result = Utilities::StringParser::convert(readData, readIntLines);
 
@@ -72,6 +73,17 @@ ProgramController::ExecuteResult ProgramController::parseReadData()
 ProgramController::ExecuteResult ProgramController::initializeJobShopData()
 {
     Program::Details::JobShopData().initializeT();
+    Program::Details::JobShopData().initializeA(Program::Details::DataFromFile());
+    Program::Details::JobShopData().initializeP(Program::Details::DataFromFile());
+
+    return returnExecuteResult(true);
+}
+
+ProgramController::ExecuteResult ProgramController::calculateJobShopTables()
+{
+    Program::Details::JobShopData().fillLO();
+    Program::Details::JobShopData().fillOFs();
+    Program::Details::JobShopData().fillPI();
 
     return returnExecuteResult(true);
 }
@@ -142,7 +154,7 @@ std::string ProgramController::getEnumString(const ProgramController::ExecuteRes
 
 std::ostream & operator<< (std::ostream & stream, const ProgramController::ExecuteResult & executeResult)
 {
-    return ( stream << ProgramController::getEnumString(executeResult) );
+    return ( stream << ProgramController::getEnumString(executeResult) ); 
 }
 
 std::map<ProgramController::TaskName, ProgramController::Task> ProgramController::mTaskMap;

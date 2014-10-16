@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 namespace Types
 {
@@ -27,10 +28,18 @@ namespace Types
             std::vector<MachineNumber> & A();
             std::vector<TaskTime> & P();
             std::vector<NumberOfAntecessors> & Lp();
+            std::vector<int> & LO();
+            std::vector<int> & OFs();
             std::vector< TaskNumber > & PI();
             std::vector< TaskPositionInPermutation > & PS();
 
             void initializeT();
+            void initializeA(std::vector< std::vector<int> > fileContent);
+            void initializeP(std::vector< std::vector<int> > fileContent);
+            
+            void fillLO();
+            void fillOFs();
+            void fillPI();
 
         private:
 
@@ -41,7 +50,13 @@ namespace Types
             std::vector<MachineNumber> mA; // A
             std::vector<TaskTime> mP; // P
             std::vector<NumberOfAntecessors> mLp; // Lp
+            std::vector<int> mLO;
             std::vector< TaskNumber > mPI; // PI
             std::vector< TaskPositionInPermutation > mPS; // PS
+            std::vector<int> mOFs;
+
+            void incrementOFs(int index);
+            unsigned int sumLO(int index);
+
     };
 }

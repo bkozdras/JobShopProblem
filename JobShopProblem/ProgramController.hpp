@@ -14,7 +14,7 @@ class ProgramController
         friend std::ostream & operator<< (std::ostream & stream, const ExecuteResult & executeResult);
 
         typedef std::function<ExecuteResult()> Task;
-        enum class TaskName : unsigned int { ReadData, ParseData, InitializeJobShopData };
+        enum class TaskName : unsigned int { ReadData, ParseData, InitializeJobShopData, CalculateJobShopTables };
         typedef std::vector< TaskName > TaskList;
 
         static void initialize(std::initializer_list< TaskName > taskList);
@@ -27,6 +27,7 @@ class ProgramController
         static ExecuteResult readDataInputFile();
         static ExecuteResult parseReadData();
         static ExecuteResult initializeJobShopData();
+        static ExecuteResult calculateJobShopTables();
 
         static void handleTaskError(const TaskName & taskName);
         static ExecuteResult returnExecuteResult(bool result);
