@@ -182,7 +182,7 @@ namespace Types
     {
         mPS.resize(mNumberOfJobs*mNumerOfMachines+1);
 
-        for (auto i = 0; i < mPI.size(); ++i)
+        for (decltype(mPI.size()) i = 0; i < mPI.size(); ++i)
         {
             mPS[mPI[i]] = i;
         }
@@ -192,13 +192,13 @@ namespace Types
     {
         mLp.resize(mNumberOfJobs*mNumerOfMachines + 1);
 
-        for (auto i = 1;  i < mT.size();  i++)
+        for (decltype(mT.size()) i = 1;  i < mT.size();  i++)
         {
             mLp[mT[i]]++;
         }
 
         int ns;
-        for (auto i = 1; i < mPS.size(); i++)
+        for (decltype(mPS.size()) i = 1; i < mPS.size(); i++)
         {
             ns = mPI[mPS[i] + 1];
             mLp[ns]++;
@@ -207,7 +207,7 @@ namespace Types
 
     void JobShopData::prepareQueue()
     {
-        for (auto i = 1; i < mLp.size(); ++i)
+        for (decltype(mLp.size()) i = 1; i < mLp.size(); ++i)
         {
             if (0 == mLp[i])
             {
@@ -223,15 +223,37 @@ namespace Types
         while (!mQ.empty())
         {
             top = getAndPopFrontElementFromQueue();
-            calculate_S_C_values_for_operation(top);
+            calculateSAndCValuesForOperation(top);
             updateLP(top);
         }
     }
 
-    void JobShopData::set_S_C_Size()
+    bool JobShopData::initialize()
     {
-        mS.resize(mNumerOfMachines*mNumberOfJobs + 1);
-        mC.resize(mNumberOfJobs*mNumerOfMachines + 1);
+        try
+        {
+            initializeT();
+            initializeA();
+            initializeP();
+            fillLO();
+            fillOFs();
+            fillPI();
+            fillPS();
+            fillLP();
+            prepareQueue();
+        }
+        catch (...)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    void JobShopData::setSAndCSize()
+    {
+        mS.resize( mNumerOfMachines * mNumberOfJobs + 1 );
+        mC.resize( mNumberOfJobs * mNumerOfMachines + 1 );
     }
 
     unsigned int JobShopData::sumLO(int index)
@@ -263,12 +285,12 @@ namespace Types
         return elem;
     }
 
-    void JobShopData::calculate_S_C_values_for_operation(unsigned int operation)
+	void JobShopData::calculateSAndCValuesForOperation(unsigned int operation)
     {
-        unsigned int tech = findTechgnologicalAntecessor(operation);
-        unsigned int mach = findMachineAntecessor(operation);
-        updateS(operation, tech, mach);
-        updateC(operation, tech, mach);
+        unsigned int technologicalAntecessor = findTechgnologicalAntecessor(operation);
+        unsigned int machineAntecessor = findMachineAntecessor(operation);
+        updateS(operation, technologicalAntecessor, machineAntecessor);
+        updateC(operation);
     }
 
     unsigned int JobShopData::findTechgnologicalAntecessor(unsigned int operation)
@@ -295,12 +317,12 @@ namespace Types
         }
     }
 
-    void JobShopData::updateS(unsigned int operation, unsigned int tech, unsigned int mach)
+	void JobShopData::updateS(unsigned int operation, unsigned int technologicalAntecessor, MachineNumber machineAntecessor)
     {
-        mS[operation] = std::max(mC[tech], mC[mach]);
+		mS[operation] = std::max(mC[technologicalAntecessor], mC[machineAntecessor]);
     }
 
-    void JobShopData::updateC(unsigned int operation, unsigned int tech, unsigned int mach)
+	void JobShopData::updateC(unsigned int operation)
     {
         mC[operation] = mS[operation] + mP[operation];
     }

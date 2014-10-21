@@ -14,7 +14,8 @@ namespace Types
     typedef unsigned int TaskPositionInPermutation;
     typedef unsigned int NumberOfAntecessors;
     typedef unsigned int TaskTime;
-    typedef unsigned int Kozdras;
+
+	enum { Separator = 0U };
 
     class JobShopData
     {
@@ -35,8 +36,8 @@ namespace Types
             std::vector<unsigned int > & PI();
             std::vector< TaskPositionInPermutation > & PS();
             std::vector<int> & PH();
-            std::vector<unsigned int> & S();
-            std::vector<unsigned int> & C();
+            std::vector<TaskTime> & S();
+            std::vector<TaskTime> & C();
 
             std::queue<TaskNumber> & Q();
 
@@ -53,7 +54,9 @@ namespace Types
             void prepareQueue();
             void countCmax();
 
-            void set_S_C_Size();
+			bool initialize();
+
+			void setSAndCSize();
 
         private:
 
@@ -70,25 +73,19 @@ namespace Types
             std::vector<int> mOFs;
             std::vector<int> mPh;
 
-            std::vector<unsigned int> mS; //czas startu danej operacji
-            std::vector<unsigned int> mC; //czas konca danej operacji
+            std::vector<TaskTime> mS; //czas startu danej operacji
+            std::vector<TaskTime> mC; //czas konca danej operacji
 
             std::queue<TaskNumber> mQ;
-
-            std::vector<Kozdras> tests;
-            std::vector<Kozdras> singleton;
-            std::vector<Kozdras> planista;
-            std::vector<Kozdras> recoveryAction;
-            // ;)
             
             void incrementOFs(int index);
             unsigned int sumLO(int index);
             unsigned int getAndPopFrontElementFromQueue();
-            void calculate_S_C_values_for_operation(unsigned int operation);
+            void calculateSAndCValuesForOperation(unsigned int operation);
             unsigned int findTechgnologicalAntecessor(unsigned int operation);
             unsigned int findMachineAntecessor(unsigned int opeartion);
-            void updateS(unsigned int operation, unsigned int technological, unsigned int machine);
-            void updateC(unsigned int operation, unsigned int technological, unsigned int machine);
+			void updateS(unsigned int operation, unsigned int technologicalAntecessor, MachineNumber machineAntecessor);
+            void updateC(unsigned int operation);
             void updateLP(int operation);
     };
 }
