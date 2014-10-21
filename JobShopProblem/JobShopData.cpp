@@ -48,7 +48,7 @@ namespace Types
         return mLO;
     }
 
-    std::vector< TaskNumber > & JobShopData::PI()
+    std::vector<unsigned int > & JobShopData::PI()
     {
         return mPI;
     }
@@ -61,6 +61,16 @@ namespace Types
     std::vector<int> & JobShopData::OFs()
     {
         return mOFs;
+    }
+
+    std::vector<int> & JobShopData::PH()
+    {
+        return mPh; 
+    }
+
+    std::vector<TaskNumber> & JobShopData::Q()
+    {
+        return mQ;
     }
 
     void JobShopData::initializeT()
@@ -154,6 +164,33 @@ namespace Types
         {
             mPI[mOFs[mA[i]]] = i; // <3  ;)
             incrementOFs(mA[i]);
+        }
+    }
+
+    void JobShopData::fillPS()
+    {
+        mPS.resize(mNumberOfJobs*mNumerOfMachines+1);
+
+        for (auto i = 0; i < mPI.size(); ++i)
+        {
+            mPS[mPI[i]] = i;
+        }
+    }
+
+    void JobShopData::fillLP()
+    {
+        mLp.resize(mNumberOfJobs*mNumerOfMachines + 1);
+
+        for (auto i = 1;  i < mT.size();  i++)
+        {
+            mLp[mT[i]]++;
+        }
+
+        int ns;
+        for (auto i = 1; i < mPS.size(); i++)
+        {
+            ns = mPI[mPS[i] + 1];
+            mLp[ns]++;
         }
     }
 

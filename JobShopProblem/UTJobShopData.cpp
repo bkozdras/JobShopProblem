@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_SUITE(UT)
         BOOST_AUTO_TEST_CASE(FillOFs_ShallReturnCorrectVector)
         {
             std::vector<int> LO = { 0, 3, 3, 3};
-            std::vector<int> expectedOFs = { 0, 1, 5, 9 }; //JAKI MA BYC POPRAWNY WYNIK - PIMPUS MOGL SIE POMYLIC WE WZORZE?!
+            std::vector<int> expectedOFs = { 0, 1, 5, 9 };
 
             Types::JobShopData jobShopData;
             jobShopData.setNumberOfJobs(3);
@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_SUITE(UT)
             std::vector<Types::MachineNumber> P = { 0, 5, 9, 8, 9, 3, 10, 9, 4, 5};
             std::vector<int> LO = { 0, 3, 3, 3 };
             std::vector<int> OFs = { 0, 1, 5, 9 };
-            std::vector<int> expectedPI = {};
+            std::vector<int> expectedPI = {0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0};
 
             Types::JobShopData jobShopData;
             jobShopData.setNumberOfJobs(3);
@@ -132,15 +132,57 @@ BOOST_AUTO_TEST_SUITE(UT)
             jobShopData.P() = P;
             jobShopData.LO() = LO;
             jobShopData.fillOFs();
-            jobShopData.fillPI(); 
+            jobShopData.fillPI();     
 
-            //BOOST_REQUIRE(jobShopData.PI().size() == expectedPI.size());
+            BOOST_REQUIRE(jobShopData.PI().size() == expectedPI.size());
 
-            //for (decltype(jobShopData.PI().size()) i = 0; i < jobShopData.PI().size(); i++)
-            //{
-            //    BOOST_REQUIRE(jobShopData.PI().at(i) == expectedPI[i]);;
-            //}
-            BOOST_REQUIRE(true);
+            for (decltype(jobShopData.PI().size()) i = 0; i < jobShopData.PI().size(); i++)
+            {
+                BOOST_REQUIRE(jobShopData.PI().at(i) == expectedPI[i]);;
+            }
+        }
+
+        BOOST_AUTO_TEST_CASE(FillPS_ShallReturnCorrectVector)
+        {
+            std::vector<unsigned int> PI = {0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0};
+            std::vector<int> expectedPS = {12,1,5,9,10,2,6,7,3,11};
+
+            Types::JobShopData jobShopData;
+            jobShopData.setNumberOfJobs(3);
+            jobShopData.setNumberOfMachines(3);
+            jobShopData.PI() = PI;
+            jobShopData.fillPS();
+
+
+            BOOST_REQUIRE(jobShopData.PS().size() == expectedPS.size());
+
+            for (decltype(jobShopData.PS().size()) i = 0; i < jobShopData.PS().size(); i++)
+            {
+                BOOST_REQUIRE(jobShopData.PS().at(i) == expectedPS[i]);;
+            }
+        }
+
+        BOOST_AUTO_TEST_CASE(FillLP_ShallReturnCorrectVector)
+        {
+            std::vector<unsigned int> PS = {12, 1, 5, 9, 10, 2, 6, 7, 3, 11 };
+            std::vector<unsigned int> PI = { 0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0 };
+            std::vector<Types::TaskNumber> T = { 0, 2, 3, 0, 5, 6, 0, 8, 9, 0 };
+            std::vector<unsigned int> expectedLP = { 6, 0, 1, 1, 1, 2, 2, 1, 2, 2 };
+
+            Types::JobShopData jobShopData;
+            jobShopData.setNumberOfJobs(3);
+            jobShopData.setNumberOfMachines(3);
+            jobShopData.T() = T;
+            jobShopData.PS() = PS;
+            jobShopData.PI() = PI;
+            jobShopData.fillLP();
+    
+            BOOST_REQUIRE(jobShopData.Lp().size() == expectedLP.size());
+
+            for (decltype(jobShopData.Lp().size()) i = 0; i < jobShopData.Lp().size(); i++)
+            {
+                BOOST_REQUIRE(jobShopData.Lp().at(i) == expectedLP[i]);;
+            }
         }
 
     BOOST_AUTO_TEST_SUITE_END()

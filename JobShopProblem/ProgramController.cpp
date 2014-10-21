@@ -85,6 +85,8 @@ ProgramController::ExecuteResult ProgramController::calculateJobShopTables()
     Program::Details::JobShopData().fillLO();
     Program::Details::JobShopData().fillOFs();
     Program::Details::JobShopData().fillPI();
+    Program::Details::JobShopData().fillPS();
+    Program::Details::JobShopData().fillLP();
 
     return returnExecuteResult(true);
 }
