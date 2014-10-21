@@ -1,5 +1,6 @@
 #include "JobShopData.hpp"
 #include "Data.hpp"
+#include <algorithm>
 
 namespace Types
 {
@@ -68,9 +69,19 @@ namespace Types
         return mPh; 
     }
 
-    std::vector<TaskNumber> & JobShopData::Q()
+    std::queue<TaskNumber> & JobShopData::Q()
     {
         return mQ;
+    }
+
+    std::vector<unsigned int> & JobShopData::S()
+    {
+        return mS;
+    }
+
+    std::vector<unsigned int> & JobShopData::C()
+    {
+        return mC;
     }
 
     void JobShopData::initializeT()
@@ -194,6 +205,35 @@ namespace Types
         }
     }
 
+    void JobShopData::prepareQueue()
+    {
+        for (auto i = 1; i < mLp.size(); ++i)
+        {
+            if (0 == mLp[i])
+            {
+                mQ.push(i);
+            }
+        }
+    }
+
+    void JobShopData::countCmax()
+    {
+        int top;
+
+        while (!mQ.empty())
+        {
+            top = getAndPopFrontElementFromQueue();
+            calculate_S_C_values_for_operation(top);
+            updateLP(top);
+        }
+    }
+
+    void JobShopData::set_S_C_Size()
+    {
+        mS.resize(mNumerOfMachines*mNumberOfJobs + 1);
+        mC.resize(mNumberOfJobs*mNumerOfMachines + 1);
+    }
+
     unsigned int JobShopData::sumLO(int index)
     {
         if ((index - 1) == 0)
@@ -214,5 +254,80 @@ namespace Types
     void JobShopData::incrementOFs(int index)
     {
         mOFs[index]++;
+    }
+
+    unsigned int JobShopData::getAndPopFrontElementFromQueue()
+    {
+        unsigned int elem = mQ.front();
+        mQ.pop();
+        return elem;
+    }
+
+    void JobShopData::calculate_S_C_values_for_operation(unsigned int operation)
+    {
+        unsigned int tech = findTechgnologicalAntecessor(operation);
+        unsigned int mach = findMachineAntecessor(operation);
+        updateS(operation, tech, mach);
+        updateC(operation, tech, mach);
+    }
+
+    unsigned int JobShopData::findTechgnologicalAntecessor(unsigned int operation)
+    {
+        if (0 == mT[operation - 1])
+        {
+            return 0;
+        }
+        else
+        {
+            return operation - 1;
+        }
+    }
+
+    unsigned int JobShopData::findMachineAntecessor(unsigned int operation)
+    {
+        if (0 == mPI[mPS[operation] - 1])
+        {
+            return 0;
+        }
+        else
+        {
+            return mPI[mPS[operation] - 1];
+        }
+    }
+
+    void JobShopData::updateS(unsigned int operation, unsigned int tech, unsigned int mach)
+    {
+        mS[operation] = std::max(mC[tech], mC[mach]);
+    }
+
+    void JobShopData::updateC(unsigned int operation, unsigned int tech, unsigned int mach)
+    {
+        mC[operation] = mS[operation] + mP[operation];
+    }
+
+    void JobShopData::updateLP(int operation)
+    {
+        int ns;
+
+        ns = mPI[mPS[operation] + 1];
+
+        if (0 != ns)
+        {
+            mLp[ns]--;
+        }
+        if (0 == mLp[ns])
+        {
+            mQ.push(ns);
+        }
+
+        ns = mT[operation];
+        if (0 != ns)
+        {
+            mLp[ns]--;
+        }
+        if (0 == mLp[ns])
+        {
+            mQ.push(ns);
+        }
     }
 }

@@ -185,6 +185,51 @@ BOOST_AUTO_TEST_SUITE(UT)
             }
         }
 
+        BOOST_AUTO_TEST_CASE(PrepareQueue_ShallReturnCorrectQueue)
+        {
+            std::vector<unsigned int> LP = { 6, 0, 1, 1, 1, 2, 2, 1, 2, 2 };
+            std::queue<unsigned int> expectedQ;
+            expectedQ.push(1);
+
+            Types::JobShopData jobShopData;
+            jobShopData.setNumberOfJobs(3);
+            jobShopData.setNumberOfMachines(3);
+            jobShopData.Lp() = LP;
+            jobShopData.prepareQueue();
+
+            BOOST_REQUIRE(jobShopData.Q().size() == expectedQ.size());
+
+            for (decltype(jobShopData.Q().size()) i = 0; i < jobShopData.Q().size(); i++)
+            {
+                BOOST_REQUIRE(jobShopData.Q()._Get_container().at(i) == expectedQ._Get_container().at(i));
+
+            }
+        }
+
+        BOOST_AUTO_TEST_CASE(PrepareQueue_ShallReturnCorrectQueue2) //zmien nazwe ;P
+        {
+            std::vector<unsigned int> LP = { 6, 0, 1, 1, 1, 0, 2, 0, 2, 2 };
+            std::queue<unsigned int> expectedQ;
+            expectedQ.push(1);
+            expectedQ.push(5);
+            expectedQ.push(7);
+
+
+            Types::JobShopData jobShopData;
+            jobShopData.setNumberOfJobs(3);
+            jobShopData.setNumberOfMachines(3);
+            jobShopData.Lp() = LP;
+            jobShopData.prepareQueue();
+
+            BOOST_REQUIRE(jobShopData.Q().size() == expectedQ.size());
+
+            for (decltype(jobShopData.Q().size()) i = 0; i < jobShopData.Q().size(); i++)
+            {
+                BOOST_REQUIRE(jobShopData.Q()._Get_container().at(i) == expectedQ._Get_container().at(i));
+
+            }
+        }
+
     BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()
