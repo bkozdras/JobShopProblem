@@ -39,12 +39,15 @@ namespace Types
             std::vector<CriticalTask> & PH();
             std::vector<TaskTime> & S();
             std::vector<TaskTime> & C();
+            std::vector<CriticalTask> & CriticalPath();
 
             std::queue<TaskNumber> & Q();
 
             void initializeT();
             void initializeA();
             void initializeP();
+            void initializePh();
+            void initializeCriticalPath();
             
             void fillLO();
             void fillOFs();
@@ -52,13 +55,17 @@ namespace Types
             void fillPS();
             void fillLP();
             void fillPH();
+            void fillCriticalPath();
 
             void prepareQueue();
             void countCmax();
 
 			bool initialize();
+            bool calculateTables();
 
 			void setSAndCSize();
+
+            void createCriticalPath();
 
         private:
 
@@ -74,6 +81,7 @@ namespace Types
             std::vector< TaskPositionInPermutation > mPS; // PS
             std::vector<int> mOFs;
             std::vector<CriticalTask> mPh;
+            std::vector<CriticalTask> mCriticalPath;
 
             std::vector<TaskTime> mS; //czas startu danej operacji
             std::vector<TaskTime> mC; //czas konca danej operacji
@@ -89,5 +97,7 @@ namespace Types
 			void updateS(unsigned int operation, unsigned int technologicalAntecessor, MachineNumber machineAntecessor);
             void updateC(unsigned int operation);
             void updateLP(int operation);
+
+            TaskTime getMaximumTaskFromC() const;
     };
 }

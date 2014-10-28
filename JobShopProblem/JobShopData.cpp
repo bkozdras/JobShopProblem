@@ -84,6 +84,11 @@ namespace Types
         return mC;
     }
 
+    std::vector<CriticalTask> & JobShopData::CriticalPath()
+    {
+        return mCriticalPath;
+    }
+
     void JobShopData::initializeT()
     {
         mT.clear();
@@ -141,6 +146,16 @@ namespace Types
                 }
             }
         }
+    }
+
+    void JobShopData::initializePh()
+    {
+        mPh.resize( mNumberOfJobs * mNumerOfMachines + 1 );
+    }
+
+    void JobShopData::initializeCriticalPath()
+    {
+        mCriticalPath.resize( mNumberOfJobs * mNumerOfMachines + 1 );
     }
 
     void JobShopData::fillLO()
@@ -210,7 +225,7 @@ namespace Types
         TaskNumber techAnt; // technological antecessor
         TaskNumber machAnt; // machine antecessor
 
-        for (NumberOfJobs i = 1; i < mNumberOfJobs * mNumerOfMachines; i++)
+        for (NumberOfJobs i = 1; i < mNumberOfJobs * mNumerOfMachines + 1; i++)
         {
             if (0 == mT[i - 1])
             {
@@ -235,6 +250,18 @@ namespace Types
                 mPh[i] = machAnt;
                 mPh[i] = techAnt;
             }
+        }
+    }
+
+    void JobShopData::fillCriticalPath()
+    {
+        TaskTime maxElementC = getMaximumTaskFromC();
+        TaskNumber techConsequent = mPh[ maxElementC ]; // technological consequent
+        mCriticalPath[mNumberOfJobs * mNumerOfMachines] = maxElementC;
+        for (decltype(mCriticalPath.size()) i = mNumberOfJobs * mNumerOfMachines - 1; i >= 1; i--)
+        {
+            mCriticalPath[techConsequent] = techConsequent;
+            techConsequent = mPh[techConsequent];
         }
     }
 
@@ -268,6 +295,19 @@ namespace Types
             initializeT();
             initializeA();
             initializeP();
+        }
+        catch (...)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    bool JobShopData::calculateTables()
+    {
+        try
+        {
             fillLO();
             fillOFs();
             fillPI();
@@ -384,5 +424,10 @@ namespace Types
         {
             mQ.push(ns);
         }
+    }
+
+    TaskTime JobShopData::getMaximumTaskFromC() const
+    {
+        return *std::max_element(mC.begin(), mC.end());
     }
 }

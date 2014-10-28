@@ -21,7 +21,8 @@ BOOST_AUTO_TEST_SUITE(UT)
                 {
                     ProgramController::TaskName::ReadData,
                     ProgramController::TaskName::ParseData,
-                    ProgramController::TaskName::InitializeJobShopData
+                    ProgramController::TaskName::InitializeJobShopData,
+                    ProgramController::TaskName::CalculateJobShopTables
                 }
             );
 

@@ -9,6 +9,15 @@
 #include "JobShopData.hpp"
 #include "Data.hpp"
 
+namespace
+{
+    class JobShopDataFixture
+    {
+        public :
+
+
+    };
+}
 
 BOOST_AUTO_TEST_SUITE(UT)
 
@@ -147,7 +156,7 @@ BOOST_AUTO_TEST_SUITE(UT)
 
         BOOST_AUTO_TEST_CASE(FillPS_ShallReturnCorrectVector)
         {
-            std::vector<unsigned int> PI = {0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0};
+            std::vector<Types::TaskPositionInPermutation> PI = { 0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0 };
             std::vector<int> expectedPS = {12,1,5,9,10,2,6,7,3,11};
 
             Types::JobShopData jobShopData;
@@ -168,9 +177,9 @@ BOOST_AUTO_TEST_SUITE(UT)
         BOOST_AUTO_TEST_CASE(FillLP_ShallReturnCorrectVector)
         {
             std::vector<unsigned int> PS = {12, 1, 5, 9, 10, 2, 6, 7, 3, 11 };
-            std::vector<unsigned int> PI = { 0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0 };
+            std::vector<Types::TaskPositionInPermutation> PI = { 0, 1, 5, 8, 0, 2, 6, 7, 0, 3, 4, 9, 0 };
             std::vector<Types::TaskNumber> T = { 0, 2, 3, 0, 5, 6, 0, 8, 9, 0 };
-            std::vector<unsigned int> expectedLP = { 6, 0, 1, 1, 1, 2, 2, 1, 2, 2 };
+            std::vector<Types::NumberOfAntecessors> expectedLP = { 6, 0, 1, 1, 1, 2, 2, 1, 2, 2 };
 
             Types::JobShopData jobShopData;
             jobShopData.setNumberOfJobs(3);
@@ -190,9 +199,8 @@ BOOST_AUTO_TEST_SUITE(UT)
 
         BOOST_AUTO_TEST_CASE(PrepareQueue_ShallReturnCorrectQueue)
         {
-            std::vector<unsigned int> LP = { 6, 0, 1, 1, 1, 2, 2, 1, 2, 2 };
-            std::queue<unsigned int> expectedQ;
-            expectedQ.push(1);
+            std::vector<Types::NumberOfAntecessors> LP = { 6, 0, 1, 1, 1, 2, 2, 1, 2, 2 };
+            std::queue<Types::TaskNumber> expectedQ = boost::assign::list_of(1).to_adapter( expectedQ );
 
             Types::JobShopData jobShopData;
             jobShopData.setNumberOfJobs(3);
@@ -211,8 +219,8 @@ BOOST_AUTO_TEST_SUITE(UT)
 
         BOOST_AUTO_TEST_CASE(PrepareQueue_ShallReturnCorrectQueueBasedOnProvidedInputData)
         {
-            std::vector<unsigned int> LP = { 6, 0, 1, 1, 1, 0, 2, 0, 2, 2 };
-            std::queue<unsigned int> expectedQ = boost::assign::list_of(1)(5)(7).to_adapter( expectedQ );
+            std::vector<Types::NumberOfAntecessors> LP = { 6, 0, 1, 1, 1, 0, 2, 0, 2, 2 };
+            std::queue<Types::TaskNumber> expectedQ = boost::assign::list_of(1)(5)(7).to_adapter( expectedQ );
 
             Types::JobShopData jobShopData;
             jobShopData.setNumberOfJobs(3);
@@ -225,7 +233,6 @@ BOOST_AUTO_TEST_SUITE(UT)
             for (decltype(jobShopData.Q().size()) i = 0; i < jobShopData.Q().size(); i++)
             {
                 BOOST_REQUIRE(jobShopData.Q()._Get_container().at(i) == expectedQ._Get_container().at(i));
-
             }
         }
 
