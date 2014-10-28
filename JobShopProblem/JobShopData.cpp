@@ -64,7 +64,7 @@ namespace Types
         return mOFs;
     }
 
-    std::vector<int> & JobShopData::PH()
+    std::vector<CriticalTask> & JobShopData::PH()
     {
         return mPh; 
     }
@@ -202,6 +202,39 @@ namespace Types
         {
             ns = mPI[mPS[i] + 1];
             mLp[ns]++;
+        }
+    }
+
+    void JobShopData::fillPH()
+    {
+        TaskNumber techAnt; // technological antecessor
+        TaskNumber machAnt; // machine antecessor
+
+        for (NumberOfJobs i = 1; i < mNumberOfJobs * mNumerOfMachines; i++)
+        {
+            if (0 == mT[i - 1])
+            {
+                techAnt = 0;
+            }
+            else
+            {
+                techAnt = i - 1;
+            }
+
+            if (0 == mPI[mPS[i] - 1])
+            {
+                machAnt = 0;
+            }
+            else
+            {
+                machAnt = mPI[mPS[i] - 1];
+            }
+
+            if (mC[machAnt] > mC[techAnt])
+            {
+                mPh[i] = machAnt;
+                mPh[i] = techAnt;
+            }
         }
     }
 

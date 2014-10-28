@@ -14,6 +14,7 @@ namespace Types
     typedef unsigned int TaskPositionInPermutation;
     typedef unsigned int NumberOfAntecessors;
     typedef unsigned int TaskTime;
+    typedef unsigned int CriticalTask;
 
 	enum { Separator = 0U };
 
@@ -35,7 +36,7 @@ namespace Types
             std::vector<int> & OFs();
             std::vector<unsigned int > & PI();
             std::vector< TaskPositionInPermutation > & PS();
-            std::vector<int> & PH();
+            std::vector<CriticalTask> & PH();
             std::vector<TaskTime> & S();
             std::vector<TaskTime> & C();
 
@@ -50,6 +51,7 @@ namespace Types
             void fillPI();
             void fillPS();
             void fillLP();
+            void fillPH();
 
             void prepareQueue();
             void countCmax();
@@ -71,7 +73,7 @@ namespace Types
             std::vector<unsigned int > mPI; // PI
             std::vector< TaskPositionInPermutation > mPS; // PS
             std::vector<int> mOFs;
-            std::vector<int> mPh;
+            std::vector<CriticalTask> mPh;
 
             std::vector<TaskTime> mS; //czas startu danej operacji
             std::vector<TaskTime> mC; //czas konca danej operacji

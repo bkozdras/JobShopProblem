@@ -1,6 +1,9 @@
 #define BOOST_TEST_DYN_LINK
 
 #include <boost/test/unit_test.hpp>
+#include <boost/assign/std/queue.hpp>
+#include <boost/assign/list_inserter.hpp>
+#include <boost/assign/list_of.hpp>
 #include "UTSettings.hpp"
 
 #include "JobShopData.hpp"
@@ -206,14 +209,10 @@ BOOST_AUTO_TEST_SUITE(UT)
             }
         }
 
-        BOOST_AUTO_TEST_CASE(PrepareQueue_ShallReturnCorrectQueue2) //zmien nazwe ;P
+        BOOST_AUTO_TEST_CASE(PrepareQueue_ShallReturnCorrectQueueBasedOnProvidedInputData)
         {
             std::vector<unsigned int> LP = { 6, 0, 1, 1, 1, 0, 2, 0, 2, 2 };
-            std::queue<unsigned int> expectedQ;
-            expectedQ.push(1);
-            expectedQ.push(5);
-            expectedQ.push(7);
-
+            std::queue<unsigned int> expectedQ = boost::assign::list_of(1)(5)(7).to_adapter( expectedQ );
 
             Types::JobShopData jobShopData;
             jobShopData.setNumberOfJobs(3);
