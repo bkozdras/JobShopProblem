@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <list>
 #include <iostream>
 #include <queue>
 
@@ -37,9 +38,11 @@ namespace Types
             std::vector<unsigned int > & PI();
             std::vector< TaskPositionInPermutation > & PS();
             std::vector<CriticalTask> & PH();
+            std::list<std::pair<int, int>> & PH2();
             std::vector<TaskTime> & S();
             std::vector<TaskTime> & C();
             std::vector<CriticalTask> & CriticalPath();
+            std::vector<unsigned int> & CurrentBestPI();
 
             std::queue<TaskNumber> & Q();
 
@@ -47,6 +50,9 @@ namespace Types
             void initializeA();
             void initializeP();
             void initializePh();
+            void initializePh2();
+            void initializeS();
+            void initializeC();
             void initializeCriticalPath();
             
             void fillLO();
@@ -55,6 +61,7 @@ namespace Types
             void fillPS();
             void fillLP();
             void fillPH();
+            void fillPH2();
             void fillCriticalPath();
 
             void prepareQueue();
@@ -66,6 +73,10 @@ namespace Types
 			void setSAndCSize();
 
             void createCriticalPath();
+
+
+            ////do innej klasy
+            void AlgorytmZstepujacy();
 
         private:
 
@@ -81,12 +92,14 @@ namespace Types
             std::vector< TaskPositionInPermutation > mPS; // PS
             std::vector<int> mOFs;
             std::vector<CriticalTask> mPh;
+            std::list<std::pair<int,int>> mPh2;
             std::vector<CriticalTask> mCriticalPath;
 
             std::vector<TaskTime> mS; //czas startu danej operacji
             std::vector<TaskTime> mC; //czas konca danej operacji
 
             std::queue<TaskNumber> mQ;
+            std::vector<unsigned int> mCurrentBestPI;
             
             void incrementOFs(int index);
             unsigned int sumLO(int index);
@@ -98,6 +111,6 @@ namespace Types
             void updateC(unsigned int operation);
             void updateLP(int operation);
 
-            TaskTime getMaximumTaskFromC() const;
+            TaskTime getIndexOfMaximumTaskFromC() const;
     };
 }

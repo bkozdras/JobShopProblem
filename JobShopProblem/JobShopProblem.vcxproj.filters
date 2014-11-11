@@ -67,6 +67,7 @@
     <ClCompile Include="JobShopData.cpp">
       <Filter>SystemUnderTest\Program</Filter>
     </ClCompile>
+    <ClCompile Include="Algorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Details.hpp">
@@ -90,5 +91,6 @@
     <ClInclude Include="UTSettings.hpp">
       <Filter>UT\Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="Algorithm.hpp" />
   </ItemGroup>
 </Project>

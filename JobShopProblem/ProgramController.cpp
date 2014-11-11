@@ -76,17 +76,31 @@ ProgramController::ExecuteResult ProgramController::initializeJobShopData()
     Program::Details::JobShopData().initializeT();
     Program::Details::JobShopData().initializeA();
     Program::Details::JobShopData().initializeP();
+    Program::Details::JobShopData().initializeC();
+    Program::Details::JobShopData().initializeS();
+    Program::Details::JobShopData().initializePh();
+    Program::Details::JobShopData().initializeCriticalPath();
 
     return returnExecuteResult(true);
 }
 
 ProgramController::ExecuteResult ProgramController::calculateJobShopTables()
 {
+    //alg. wstepny
     Program::Details::JobShopData().fillLO();
     Program::Details::JobShopData().fillOFs();
     Program::Details::JobShopData().fillPI();
     Program::Details::JobShopData().fillPS();
     Program::Details::JobShopData().fillLP();
+    Program::Details::JobShopData().prepareQueue();
+    Program::Details::JobShopData().countCmax();
+    Program::Details::JobShopData().fillPH();
+    Program::Details::JobShopData().fillCriticalPath();
+    Program::Details::JobShopData().fillPH2();
+    //alg. zstepujacy
+    Program::Details::JobShopData().AlgorytmZstepujacy();
+
+
 
     return returnExecuteResult(true);
 }

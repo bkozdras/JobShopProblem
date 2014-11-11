@@ -69,6 +69,11 @@ namespace Types
         return mPh; 
     }
 
+    std::list<std::pair<int, int>> & JobShopData::PH2()
+    {
+        return mPh2;
+    }
+
     std::queue<TaskNumber> & JobShopData::Q()
     {
         return mQ;
@@ -87,6 +92,11 @@ namespace Types
     std::vector<CriticalTask> & JobShopData::CriticalPath()
     {
         return mCriticalPath;
+    }
+
+    std::vector<unsigned int> & JobShopData::CurrentBestPI()
+    {
+        return mCurrentBestPI;
     }
 
     void JobShopData::initializeT()
@@ -153,6 +163,21 @@ namespace Types
         mPh.resize( mNumberOfJobs * mNumerOfMachines + 1 );
     }
 
+    void JobShopData::initializePh2()
+    {
+        mPh2.resize(mNumberOfJobs * mNumerOfMachines + 1);
+    }
+
+    void JobShopData::initializeC()
+    {
+        mC.resize(mNumberOfJobs * mNumerOfMachines + 1);
+    }
+
+    void JobShopData::initializeS()
+    {
+        mS.resize(mNumberOfJobs * mNumerOfMachines + 1);
+    }
+
     void JobShopData::initializeCriticalPath()
     {
         mCriticalPath.resize( mNumberOfJobs * mNumerOfMachines + 1 );
@@ -172,6 +197,7 @@ namespace Types
 
     void JobShopData::fillOFs()
     {
+        mOFs.clear();
         mOFs.resize(mNumerOfMachines + 1);
         mOFs[0] = 0;
 
@@ -195,6 +221,7 @@ namespace Types
 
     void JobShopData::fillPS()
     {
+        mPS.clear();
         mPS.resize(mNumberOfJobs*mNumerOfMachines+1);
 
         for (decltype(mPI.size()) i = 0; i < mPI.size(); ++i)
@@ -205,15 +232,16 @@ namespace Types
 
     void JobShopData::fillLP()
     {
+        mLp.clear();
         mLp.resize(mNumberOfJobs*mNumerOfMachines + 1);
 
-        for (decltype(mT.size()) i = 1;  i < mT.size();  i++)
+        for (int i = 1;  i < mT.size();  i++)
         {
             mLp[mT[i]]++;
         }
 
         int ns;
-        for (decltype(mPS.size()) i = 1; i < mPS.size(); i++)
+        for (int i = 1; i < mPS.size(); i++)
         {
             ns = mPI[mPS[i] + 1];
             mLp[ns]++;
@@ -248,21 +276,63 @@ namespace Types
             if (mC[machAnt] > mC[techAnt])
             {
                 mPh[i] = machAnt;
+            }
+            else
+            {
                 mPh[i] = techAnt;
             }
         }
     }
 
+    void JobShopData::fillPH2()
+    {
+        //if ((Ph[i + 1] == job.T[Ph[i]]) && (Ps[Ph[i + 1]] + 1 == Ps[Ph[i + 2]]))
+        // if ((Ps[Ph[i]] + 1 == Ps[Ph[i + 1]]) && (Ph[i + 2] == job.T[Ph[i + 1]]))
+
+        int task1 = 0;
+        int task2 = 0;
+
+        for (auto i = 2; i < mCriticalPath.size() - 2; ++i)
+        {
+            //     poprz. technologiczny               nastepnik maszynowy
+            if ((mCriticalPath[i + 1] == mT[mCriticalPath[i]]) && (mPS[mCriticalPath[i + 1]] + 1 == mPS[mCriticalPath[i + 2]]))
+            {
+                task1 = i+1;
+            }
+
+            //     poprz maszynowy                        nast.technologiczny
+            if ((mPS[mCriticalPath[i]] + 1 == mPS[mCriticalPath[i + 1]]) && (mCriticalPath[i + 2] == mT[mCriticalPath[i + 1]]))
+            {
+                task2 = i+1;
+            }
+
+            //
+            /*if ((mPS[mPh[mCriticalPath.size() - 1]] + 1 == mPS[mPh[mCriticalPath.size()-1]]))
+            {
+                task2 = mCriticalPath.size()-1;
+            }*/
+
+            if (task1 != 0 && task2 != 0)
+            {
+                mPh2.push_back(std::make_pair(task1, task2));
+                task1 = 0;
+                task2 = 0;
+            }
+        }
+        int a =0;
+    }
+
     void JobShopData::fillCriticalPath()
     {
-        TaskTime maxElementC = getMaximumTaskFromC();
+        TaskTime maxElementC = getIndexOfMaximumTaskFromC();
         TaskNumber techConsequent = mPh[ maxElementC ]; // technological consequent
         mCriticalPath[mNumberOfJobs * mNumerOfMachines] = maxElementC;
-        for (decltype(mCriticalPath.size()) i = mNumberOfJobs * mNumerOfMachines - 1; i >= 1; i--)
+        for (auto i = mNumberOfJobs * mNumerOfMachines - 1; i >= 1; i--)
         {
             mCriticalPath[techConsequent] = techConsequent;
             techConsequent = mPh[techConsequent];
         }
+
     }
 
     void JobShopData::prepareQueue()
@@ -426,8 +496,73 @@ namespace Types
         }
     }
 
-    TaskTime JobShopData::getMaximumTaskFromC() const
+    TaskTime JobShopData::getIndexOfMaximumTaskFromC() const
     {
-        return *std::max_element(mC.begin(), mC.end());
+        return std::distance(mC.begin(), std::max_element(mC.begin(), mC.end()));
+    }
+
+    ///// do innej klasy
+    void JobShopData::AlgorytmZstepujacy()
+    {    
+        unsigned int task1, task2;
+        std::vector<unsigned int> tmpCmax; //wektor Cmax'ow dla dla kazdej zamiany z listy Ph2
+        tmpCmax.resize(mPh2.size());
+
+        //przepisanie tablicy pi wyliczonej przez poprzedni algorytm
+        mCurrentBestPI = mPI;
+        //zapamietanie wstepnego Cmax
+        unsigned int globalCmax = *std::max_element(mC.begin(), mC.end());
+        bool isChanged = true;
+
+
+        while (isChanged)
+        {
+            for (auto i = 0; i < mPh2.size(); ++i)
+            {
+                auto iterator = mPh2.begin();
+                std::advance(iterator, i); // przesun iterator o i ???
+                task1 = std::get<0>(*iterator);
+                task2 = std::get<1>(*iterator);
+                std::swap(mPI[mPS[task1]], mPI[mPS[task2]]);
+
+                //oO
+                fillPS();
+                fillLP();
+                prepareQueue();
+                countCmax();
+                tmpCmax[i] = *std::max_element(mC.begin(), mC.end());
+
+                mPI = mCurrentBestPI;
+            }
+
+            //indeks elemetu z tablicy tmpCmax o najmniejszym Cmaxie po zamianie
+            unsigned int IndexOfMinCmax = std::distance(tmpCmax.begin(), std::min_element(tmpCmax.begin(), tmpCmax.end()));
+
+            //czy nastapila globalna poprawa
+            if (globalCmax > tmpCmax[IndexOfMinCmax])
+            {
+                globalCmax = tmpCmax[IndexOfMinCmax];
+                
+                auto iterator = mPh2.begin();
+                std::advance(iterator, IndexOfMinCmax); // przesun iterator o i ???
+                task1 = std::get<0>(*iterator);
+                task2 = std::get<1>(*iterator);
+                std::swap(mPI[mPS[task1]], mPI[mPS[task2]]);
+                mCurrentBestPI = mPI;
+                mPh2.clear();
+
+                fillPS();
+                fillLP();
+                prepareQueue();
+                countCmax();
+                fillPH();
+                fillCriticalPath();
+                fillPH2();
+            }
+            else
+            {
+                isChanged = false;
+            }
+        }
     }
 }

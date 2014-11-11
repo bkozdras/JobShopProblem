@@ -1,7 +1,7 @@
 #pragma once
 
 // Please comment below phrase in case of Karol's PC
-#define IS_BARTEK_PC
+//#define IS_BARTEK_PC
 
 #ifdef IS_BARTEK_PC
 
