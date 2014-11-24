@@ -236,6 +236,16 @@ BOOST_AUTO_TEST_SUITE(UT)
             }
         }
 
+  /*      BOOST_AUTO_TEST_CASE(ElementInTabuList_ElementIsOnList_ShallReturnTrue)
+        {
+            Types::JobShopData jobShopData;
+            jobShopData.TabuList
+            std::pair<int, int> pair = std::make_pair(7, 5);
+
+            BOOST_REQUIRE(false == jobShopData.elementInTabuList(pair));
+
+        }
+*/
     BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_SUITE_END()

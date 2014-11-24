@@ -45,6 +45,7 @@ namespace Types
             std::vector<unsigned int> & CurrentBestPI();
 
             std::queue<TaskNumber> & Q();
+            std::vector<std::pair<int, int>> & TabuList(){ return mTabuList; }
 
             void initializeT();
             void initializeA();
@@ -77,6 +78,9 @@ namespace Types
 
             ////do innej klasy
             void AlgorytmZstepujacy();
+            void TabuSearch();
+            //do tabu search
+            bool elementInTabuList(const std::pair<int, int>& element);
 
         private:
 
@@ -98,6 +102,8 @@ namespace Types
             std::vector<TaskTime> mS; //czas startu danej operacji
             std::vector<TaskTime> mC; //czas konca danej operacji
 
+            std::vector<std::pair<int, int>> mTabuList; // lista tabu
+
             std::queue<TaskNumber> mQ;
             std::vector<unsigned int> mCurrentBestPI;
             
@@ -112,5 +118,8 @@ namespace Types
             void updateLP(int operation);
 
             TaskTime getIndexOfMaximumTaskFromC() const;
+
+            std::vector<std::pair<int, int>> geneateAllPossibleChangesInBlock(std::pair<int, int> pair);
+            
     };
 }

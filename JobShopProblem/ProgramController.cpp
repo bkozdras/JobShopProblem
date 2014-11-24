@@ -79,7 +79,6 @@ ProgramController::ExecuteResult ProgramController::initializeJobShopData()
     Program::Details::JobShopData().initializeC();
     Program::Details::JobShopData().initializeS();
     Program::Details::JobShopData().initializePh();
-    Program::Details::JobShopData().initializeCriticalPath();
 
     return returnExecuteResult(true);
 }
@@ -99,6 +98,8 @@ ProgramController::ExecuteResult ProgramController::calculateJobShopTables()
     Program::Details::JobShopData().fillPH2();
     //alg. zstepujacy
     Program::Details::JobShopData().AlgorytmZstepujacy();
+    //alg. tabu search
+    Program::Details::JobShopData().TabuSearch();
 
 
 

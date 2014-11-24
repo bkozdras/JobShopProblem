@@ -286,52 +286,68 @@ namespace Types
 
     void JobShopData::fillPH2()
     {
-        //if ((Ph[i + 1] == job.T[Ph[i]]) && (Ps[Ph[i + 1]] + 1 == Ps[Ph[i + 2]]))
-        // if ((Ps[Ph[i]] + 1 == Ps[Ph[i + 1]]) && (Ph[i + 2] == job.T[Ph[i + 1]]))
-
+        mPh2.clear();
         int task1 = 0;
         int task2 = 0;
 
-        for (auto i = 2; i < mCriticalPath.size() - 2; ++i)
+        if (mPS[mCriticalPath[1]] + 1 == mPS[mCriticalPath[2]])
+            task1 = 1;
+
+        for (auto i = 1; i < mCriticalPath.size() - 2; ++i)
         {
             //     poprz. technologiczny               nastepnik maszynowy
-            if ((mCriticalPath[i + 1] == mT[mCriticalPath[i]]) && (mPS[mCriticalPath[i + 1]] + 1 == mPS[mCriticalPath[i + 2]]))
+            if ((mCriticalPath[i + 1] == mT[mCriticalPath[i]]) && ((mPS[mCriticalPath[i + 1]] + 1) == mPS[mCriticalPath[i + 2]]))
             {
-                task1 = i+1;
+                task1 = i + 1;
             }
 
             //     poprz maszynowy                        nast.technologiczny
-            if ((mPS[mCriticalPath[i]] + 1 == mPS[mCriticalPath[i + 1]]) && (mCriticalPath[i + 2] == mT[mCriticalPath[i + 1]]))
+            if ((mPS[mCriticalPath[i]] + 1 == mPS[mCriticalPath[i + 1]]) && (mCriticalPath[i + 2] == mT[mCriticalPath[i + 1]] || (mCriticalPath[i + 1] == mCriticalPath[mCriticalPath.size()-1] )))
             {
                 task2 = i+1;
             }
 
-            //
-            /*if ((mPS[mPh[mCriticalPath.size() - 1]] + 1 == mPS[mPh[mCriticalPath.size()-1]]))
-            {
-                task2 = mCriticalPath.size()-1;
-            }*/
-
             if (task1 != 0 && task2 != 0)
             {
-                mPh2.push_back(std::make_pair(task1, task2));
+                mPh2.push_back(std::make_pair(std::min(task1, task2), std::max(task1, task2)));
                 task1 = 0;
                 task2 = 0;
             }
+
+        }//koniec for
+        if (mPS[mCriticalPath[mCriticalPath.size() - 2]] + 1 == mPS[mCriticalPath[mCriticalPath.size() - 1]])
+        {
+            task2 = mCriticalPath.size() - 1;
         }
+
+        if (task1 != 0 && task2 != 0)
+        {
+            mPh2.push_back(std::make_pair(std::min(task1, task2), std::max(task1, task2)));
+            task1 = 0;
+            task2 = 0;
+        }
+
+
+
         int a =0;
     }
 
     void JobShopData::fillCriticalPath()
     {
+        //mCriticalPath.resize(mNumberOfJobs*mNumerOfMachines + 1);
+        mCriticalPath.clear();
         TaskTime maxElementC = getIndexOfMaximumTaskFromC();
         TaskNumber techConsequent = mPh[ maxElementC ]; // technological consequent
-        mCriticalPath[mNumberOfJobs * mNumerOfMachines] = maxElementC;
-        for (auto i = mNumberOfJobs * mNumerOfMachines - 1; i >= 1; i--)
+
+        mCriticalPath.push_back(maxElementC);
+
+        while (0 != techConsequent)
         {
-            mCriticalPath[techConsequent] = techConsequent;
+            mCriticalPath.insert(mCriticalPath.begin(), techConsequent);
             techConsequent = mPh[techConsequent];
         }
+        mCriticalPath.insert(mCriticalPath.begin(), 0);
+        int a = 0;
 
     }
 
@@ -506,6 +522,7 @@ namespace Types
     {    
         unsigned int task1, task2;
         std::vector<unsigned int> tmpCmax; //wektor Cmax'ow dla dla kazdej zamiany z listy Ph2
+        tmpCmax.clear();
         tmpCmax.resize(mPh2.size());
 
         //przepisanie tablicy pi wyliczonej przez poprzedni algorytm
@@ -523,7 +540,7 @@ namespace Types
                 std::advance(iterator, i); // przesun iterator o i ???
                 task1 = std::get<0>(*iterator);
                 task2 = std::get<1>(*iterator);
-                std::swap(mPI[mPS[task1]], mPI[mPS[task2]]);
+                std::swap(mPI[mPS[mCriticalPath[task1]]], mPI[mPS[mCriticalPath[task2]]]);
 
                 //oO
                 fillPS();
@@ -565,4 +582,108 @@ namespace Types
             }
         }
     }
+
+    //TABU SEARCH
+    void JobShopData::TabuSearch()
+    {
+        const unsigned int tabuListLength = 7;
+        unsigned int iterations = 1000;
+        unsigned int task1, task2;
+        mPh2.clear();
+
+        //przepisanie tablicy pi wyliczonej przez poprzedni algorytm
+        std::vector<unsigned int>originalPI = mPI;
+        mCurrentBestPI = mPI;
+
+        std::pair<int, int> BestMove;
+        unsigned int BestCmax = *std::max_element(mC.begin(), mC.end());;
+ 
+        unsigned int BestTempCmax = 99999;
+        unsigned int TempCmax = 99999;
+
+        
+        mTabuList.insert(mTabuList.begin(), tabuListLength, std::make_pair(0,0));
+
+        
+        for (auto i = 0; i < iterations; ++i)
+        {
+            fillPS();
+            fillLP();
+            prepareQueue();
+            countCmax();
+            fillPH();
+            fillCriticalPath();
+            fillPH2();
+
+            for(auto& pair: mPh2)
+            {
+                std::vector < std::pair<int, int>> all_changes = geneateAllPossibleChangesInBlock(pair);
+                //czy Ph2[i] jest na liscie tabu
+                //if (std::min(Ph2[j], Ph2[j + 1]) == TabuList[k].first && std::max(Ph2[j], Ph2[j + 1]) == TabuList[k].second)
+                if (false == elementInTabuList(pair))
+                {
+
+                    task1 = std::get<0>(pair);
+                    task2 = std::get<1>(pair);
+                    std::swap(mPI[mPS[mCriticalPath[task1]]], mPI[mPS[mCriticalPath[task2]]]);
+                    fillPS();
+                    fillLP();
+                    prepareQueue();
+                    countCmax();
+                    TempCmax = *std::max_element(mC.begin(), mC.end());
+
+                    if (BestTempCmax > TempCmax)
+                    {
+                        BestTempCmax = TempCmax;
+                        BestMove = pair;
+                    }
+                    //odtworz pi
+                    mPI = originalPI;
+                }
+            }
+
+            
+            //Ph2[0] = BestMove.first;
+            //Ph2[1] = BestMove.second;
+            //SwapPi(0);
+            task1 = std::get<0>(BestMove);
+            task2 = std::get<1>(BestMove);
+            std::swap(mPI[mPS[mCriticalPath[task1]]], mPI[mPS[mCriticalPath[task2]]]);
+
+            if (BestTempCmax < BestCmax)
+            {
+                mCurrentBestPI = mPI;
+            }
+
+            //for (int i = 0; i < OriginalPi.size(); i++)
+            //{
+            //    OriginalPi[i] = Pi[i];
+            //}
+            originalPI = mPI;
+            mTabuList.pop_back();
+            mTabuList.insert(mTabuList.begin(), 1, BestMove);
+            ;
+        }
+    }
+
+        bool JobShopData::elementInTabuList(const std::pair<int, int>& element)
+        {
+            const auto position = std::find(mTabuList.begin(), mTabuList.end(), element);
+
+            return position == mTabuList.end() ? false : true;
+        }
+
+        std::vector<std::pair<int, int>> JobShopData::geneateAllPossibleChangesInBlock(std::pair<int, int> pair)
+        {
+            unsigned int task1 = std::get<0>(pair);
+            unsigned int task2 = std::get<1>(pair);
+
+            std::vector<std::pair<int, int>> result;
+
+            for (auto i = task1; i < task2; ++i)
+            {
+                result.push_back(std::make_pair(mCriticalPath[i], mCriticalPath[i + 1]));
+            }
+            return result;
+        }
 }
